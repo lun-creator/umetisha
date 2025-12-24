@@ -36,4 +36,5 @@ if (resolution){
 } else {
    messageElement.innerHTML="please enter your resolution";
 }
-  form.reset(); // clear the input field});
+  form.reset(); // clear the input field
+});
