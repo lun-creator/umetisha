@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>League Manager</title>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#f0f2f5;
+margin:0;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+input,select{
+padding:10px;
+margin:5px;
+}
+
+button{
+padding:10px 15px;
+background:#1877f2;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1 id="leagueTitle">League</h1>
+
+<div class="card">
+
+<h2>Add Team</h2>
+
+<input
+type="text"
+id="teamName"
+placeholder="Team Name">
+
+<button onclick="addTeam()">
+Add Team
+</button>
+
+<ul id="teamList"></ul>
+
+</div>
+
+<div class="card">
+
+<h2>Generate Fixtures</h2>
+
+<button onclick="generateFixtures()">
+Generate
+</button>
+
+<ul id="fixtures"></ul>
+
+</div>
+
+<div class="card">
+
+<h2>Add Match Result</h2>
+
+<select id="homeTeam"></select>
+
+<select id="awayTeam"></select>
+
+<input
+type="number"
+id="homeScore"
+placeholder="Home">
+
+<input
+type="number"
+id="awayScore"
+placeholder="Away">
+
+<button onclick="saveResult()">
+Save
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Standings</h2>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Team</th>
+<th>P</th>
+<th>W</th>
+<th>D</th>
+<th>L</th>
+<th>Pts</th>
+</tr>
+
+</thead>
+
+<tbody id="standings"></tbody>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h2>Top Scorers</h2>
+
+<input
+id="playerName"
+placeholder="Player Name">
+
+<input
+id="playerTeam"
+placeholder="Team">
+
+<input
+type="number"
+id="goals"
+placeholder="Goals">
+
+<button onclick="addScorer()">
+Add
+</button>
+
+<ul id="scorerList"></ul>
+
+</div>
+
+<script>
+
+document.getElementById(
+"leagueTitle"
+).innerText =
+localStorage.getItem("currentLeague")
+|| "League";
+
+let teams=[];
+let scorers=[];
+
+function addTeam(){
+
+const name=
+document.getElementById(
+"teamName"
+).value;
+
+if(name==="") return;
+
+teams.push({
+
+name:name,
+played:0,
+won:0,
+draw:0,
+lost:0,
+points:0
+
+});
+
+renderTeams();
+renderStandings();
+updateSelects();
+
+document.getElementById(
+"teamName"
+).value="";
+
+}
+
+function renderTeams(){
+
+document.getElementById(
+"teamList"
+).innerHTML=
+
+teams.map(team=>
+
+`<li>${team.name}</li>`
+
+).join("");
+
+}
+
+function updateSelects(){
+
+const home=
+document.getElementById(
+"homeTeam"
+);
+
+const away=
+document.getElementById(
+"awayTeam"
+);
+
+home.innerHTML="";
+away.innerHTML="";
+
+teams.forEach(team=>{
+
+home.innerHTML +=
+`<option>${team.name}</option>`;
+
+away.innerHTML +=
+`<option>${team.name}</option>`;
+
+});
+
+}
+
+function generateFixtures(){
+
+let matches=[];
+
+for(let i=0;i<teams.length;i++){
+
+for(let j=i+1;j<teams.length;j++){
+
+matches.push(
+`${teams[i].name} vs ${teams[j].name}`
+);
+
+}
+
+}
+
+document.getElementById(
+"fixtures"
+).innerHTML=
+
+matches.map(match=>
+
+`<li>${match}</li>`
+
+).join("");
+
+}
+
+function saveResult(){
+
+const home=
+document.getElementById(
+"homeTeam"
+).value;
+
+const away=
+document.getElementById(
+"awayTeam"
+).value;
+
+if(home===away){
+
+alert(
+"Choose different teams"
+);
+
+return;
+
+}
+
+const hs=
+parseInt(
+document.getElementById(
+"homeScore"
+).value
+);
+
+const as=
+parseInt(
+document.getElementById(
+"awayScore"
+).value
+);
+
+let h=
+teams.find(t=>t.name===home);
+
+let a=
+teams.find(t=>t.name===away);
+
+h.played++;
+a.played++;
+
+if(hs>as){
+
+h.won++;
+a.lost++;
+
+h.points+=3;
+
+}
+
+else if(as>hs){
+
+a.won++;
+h.lost++;
+
+a.points+=3;
+
+}
+
+else{
+
+h.draw++;
+a.draw++;
+
+h.points++;
+a.points++;
+
+}
+
+renderStandings();
+
+}
+
+function renderStandings(){
+
+teams.sort(
+(a,b)=>b.points-a.points
+);
+
+let html="";
+
+teams.forEach(team=>{
+
+html += `
+
+<tr>
+
+<td>${team.name}</td>
+<td>${team.played}</td>
+<td>${team.won}</td>
+<td>${team.draw}</td>
+<td>${team.lost}</td>
+<td>${team.points}</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById(
+"standings"
+).innerHTML=html;
+
+}
+
+function addScorer(){
+
+scorers.push({
+
+name:
+document.getElementById(
+"playerName"
+).value,
+
+team:
+document.getElementById(
+"playerTeam"
+).value,
+
+goals:
+parseInt(
+document.getElementById(
+"goals"
+).value)
+
+});
+
+renderScorers();
+
+}
+
+function renderScorers(){
+
+scorers.sort(
+(a,b)=>b.goals-a.goals
+);
+
+document.getElementById(
+"scorerList"
+).innerHTML=
+
+scorers.map(player=>
+
+`<li>
+${player.name}
+(${player.team})
+- ${player.goals} goals
+</li>`
+
+).join("");
+
+}
+
+</script>
+
+</body>
+</html>
