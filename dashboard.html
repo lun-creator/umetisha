@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LeagueHub Dashboard</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f0f2f5;
+}
+
+header{
+background:#1877f2;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.container{
+width:90%;
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+margin-bottom:10px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+button{
+background:#1877f2;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.league{
+background:#fff;
+padding:15px;
+border-radius:10px;
+margin-bottom:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.openBtn{
+background:green;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h2>⚽ LeagueHub</h2>
+
+<div>
+Welcome User
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h3>Create New League</h3>
+
+<input
+type="text"
+id="leagueName"
+placeholder="Enter League Name">
+
+<button onclick="createLeague()">
+Create League
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Your Leagues</h3>
+
+<div id="leagueList"></div>
+
+</div>
+
+</div>
+
+<script>
+
+let leagues=[];
+
+function createLeague(){
+
+let name =
+document.getElementById(
+"leagueName"
+).value;
+
+if(name===""){
+
+alert("Enter league name");
+return;
+
+}
+
+leagues.push(name);
+
+document.getElementById(
+"leagueName"
+).value="";
+
+renderLeagues();
+
+}
+
+function renderLeagues(){
+
+let html="";
+
+leagues.forEach((league,index)=>{
+
+html += `
+
+<div class="league">
+
+<span>${league}</span>
+
+<button
+class="openBtn"
+onclick="openLeague(${index})">
+
+Open
+
+</button>
+
+</div>
+
+`;
+
+});
+
+document.getElementById(
+"leagueList"
+).innerHTML = html;
+
+}
+
+function openLeague(index){
+
+localStorage.setItem(
+"currentLeague",
+leagues[index]
+);
+
+window.location =
+"league.html";
+
+}
+
+</script>
+
+</body>
+</html>
